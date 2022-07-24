@@ -14,35 +14,6 @@ class Telebot
         $this->apiURL = "https://api.telegram.org/bot" . $this->token;
     }
 
-    public function command(string $command, callable $callback)
-    {
-        $task = [
-            "args" => [$command, $callback],
-            "do" =>  function (string $command, callable $callback) {
-                if ($this->update == null) return;
-
-                $ctx = $this->createContext($this->update);
-
-                if ($ctx->message != null) {
-                    if (strpos($ctx->text, "/$command") === 0) {
-                        $callback($ctx);
-                    }
-                }
-            }
-        ];
-        array_push($this->tasks, $task);
-    }
-
-    public function run()
-    {
-        $json = file_get_contents('php://input');
-        $this->update = json_decode($json);
-
-        foreach ($this->tasks as $task) {
-            $task["do"](...$task["args"]);
-        }
-    }
-
     private function createContext($update)
     {
         return new class($this->apiURL, $update)
@@ -94,4 +65,34 @@ class Telebot
             }
         };
     }
+    
+    public function command(string $command, callable $callback)
+    {
+        $task = [
+            "args" => [$command, $callback],
+            "do" =>  function (string $command, callable $callback) {
+                if ($this->update == null) return;
+
+                $ctx = $this->createContext($this->update);
+
+                if ($ctx->message != null) {
+                    if (strpos($ctx->text, "/$command") === 0) {
+                        $callback($ctx);
+                    }
+                }
+            }
+        ];
+        array_push($this->tasks, $task);
+    }
+
+    public function run()
+    {
+        $json = file_get_contents('php://input');
+        $this->update = json_decode($json);
+
+        foreach ($this->tasks as $task) {
+            $task["do"](...$task["args"]);
+        }
+    }
+
 }
