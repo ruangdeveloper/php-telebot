@@ -3,7 +3,7 @@
 require_once("./Telebot.php");
 
 // initialize bot
-$bot = new Telebot("5463467053:AAGVy87O-PKc9wh-gIpA-1E6j0zv3Ox-kTY");
+$bot = new Telebot("");
 
 // handle start command
 $bot->command("start", function ($ctx) {
